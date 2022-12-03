@@ -132,12 +132,12 @@ struct AllFilesSplitView: View {
     } detail: {
       if let buffer = viewModel.activeFile {
         FileEditor(buffer: buffer)
-          .id(buffer.key)
           .onDisappear {
             Task {
               try? await buffer.save()
             }
           }
+          .id(buffer.key)
       }
     }
     .task {
