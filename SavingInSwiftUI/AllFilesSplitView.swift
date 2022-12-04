@@ -14,22 +14,24 @@ struct AllFilesSplitView: View {
     /// This is the file we are actively editing.
     @Published var activeFile: FileBuffer?
 
-    /// A Binding to the filename we are currently editing.
+    /// The filename of the file we are currently editing.
     ///
-    /// If you change the filename, this will create a new `activeFile` instance for the new file.
-    var activeFilename: Binding<String?> {
-      Binding<String?> { [weak self] in
-        self?.activeFile?.filename
-      } set: { [weak self] newKey in
-        guard let self, self.activeFile?.filename != newKey else { return }
-        self.activeFile = newKey.flatMap { FileBuffer(filename: $0) }
+    /// If you change this property, it will create a new `activeFile` instance for the new file.
+    var activeFilename: String? {
+      get {
+        activeFile?.filename
+      }
+      set {
+        if activeFile?.filename != newValue {
+          activeFile = newValue.flatMap { FileBuffer(filename: $0) }
+        }
       }
     }
   }
 
   var body: some View {
     NavigationSplitView {
-      List(state.allKeys, id: \.self, selection: viewModel.activeFilename) { key in
+      List(state.allKeys, id: \.self, selection: $viewModel.activeFilename) { key in
         Text(key)
       }
     } detail: {
