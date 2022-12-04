@@ -9,7 +9,7 @@ final class FileBuffer: ObservableObject, Identifiable {
   init(filename: String) {
     self.filename = filename
     Task {
-      buffer = try await FakeFileSystem.shared.loadFile(filename: filename)
+      _text = try await FakeFileSystem.shared.loadFile(filename: filename)
       isLoading = false
     }
   }
@@ -25,16 +25,16 @@ final class FileBuffer: ObservableObject, Identifiable {
   @Published var isLoading = true
 
   /// The actual file contents. This is private
-  private var buffer = ""
+  private var _text = ""
 
-  var textBinding: Binding<String> {
-    Binding<String> { [weak self] in
-      self?.buffer ?? ""
-    } set: { [weak self] updatedString in
-      guard let self else { return }
-      self.buffer = updatedString
-      self.isDirty = true
-      self.autosaveIfNeeded()
+  var text: String {
+    get {
+      _text
+    }
+    set {
+      _text = newValue
+      isDirty = true
+      createAutosaveTaskIfNeeded()
     }
   }
 
@@ -53,7 +53,7 @@ final class FileBuffer: ObservableObject, Identifiable {
     // 4. The i/o from step 2 finishes, and you set isDirty = false. HOWEVER, the current contents of the buffer ("version 2")
     //    have not been saved. The buffer is dirty, and you won't save "version 2" unless you make more changes later.
     isDirty = false
-    try await FakeFileSystem.shared.saveFile(buffer, filename: filename)
+    try await FakeFileSystem.shared.saveFile(_text, filename: filename)
   }
 
   private(set) var autosaveTask: Task<Void, Never>?
@@ -62,7 +62,7 @@ final class FileBuffer: ObservableObject, Identifiable {
   ///
   /// The autosave task will save the contents of the buffer at a point in the future.
   /// This lets you batch up saves versus trying to save on each keystroke.
-  func autosaveIfNeeded() {
+  private func createAutosaveTaskIfNeeded() {
     guard autosaveTask == nil else { return }
     autosaveTask = Task {
       try? await Task.sleep(until: .now + .seconds(5), clock: .continuous)

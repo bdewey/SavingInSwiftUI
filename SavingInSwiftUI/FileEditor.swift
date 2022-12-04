@@ -11,7 +11,7 @@ struct FileEditor: View {
     if buffer.isLoading {
       ProgressView()
     } else {
-      TextEditor(text: buffer.textBinding)
+      TextEditor(text: $buffer.text)
         .font(.body.leading(.loose))
     }
   }
