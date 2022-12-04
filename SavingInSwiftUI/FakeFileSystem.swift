@@ -1,9 +1,4 @@
-//
-//  FakeFileSystem.swift
-//  SavingInSwiftUI
-//
-//  Created by Brian Dewey on 12/4/22.
-//
+// Copyright © 2022 Brian Dewey. Available under the MIT License, see LICENSE for details.
 
 import Foundation
 
@@ -45,4 +40,3 @@ actor FakeFileSystem {
 
   private init() {}
 }
-

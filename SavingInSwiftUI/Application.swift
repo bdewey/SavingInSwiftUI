@@ -1,4 +1,4 @@
-//  Created by Brian Dewey on 9/11/22.
+// Copyright © 2022 Brian Dewey. Available under the MIT License, see LICENSE for details.
 
 import SwiftUI
 
@@ -23,4 +23,3 @@ struct Application: App {
     }
   }
 }
-

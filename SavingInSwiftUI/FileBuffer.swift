@@ -1,9 +1,4 @@
-//
-//  FileBuffer.swift
-//  SavingInSwiftUI
-//
-//  Created by Brian Dewey on 12/4/22.
-//
+// Copyright © 2022 Brian Dewey. Available under the MIT License, see LICENSE for details.
 
 import Foundation
 import SwiftUI
@@ -61,7 +56,7 @@ final class FileBuffer: ObservableObject, Identifiable {
     try await FakeFileSystem.shared.saveFile(buffer, filename: filename)
   }
 
-  private(set) var autosaveTask: Task<(), Never>?
+  private(set) var autosaveTask: Task<Void, Never>?
 
   /// Creates an autosave task, if needed.
   ///
@@ -76,4 +71,3 @@ final class FileBuffer: ObservableObject, Identifiable {
     }
   }
 }
-
