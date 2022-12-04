@@ -37,12 +37,6 @@ struct AllFilesSplitView: View {
     } detail: {
       if let buffer = viewModel.activeFile {
         FileEditor(buffer: buffer)
-          .onDisappear {
-            Task {
-              try? await buffer.save()
-            }
-          }
-          .id(buffer.filename)
       }
     }
     .task {

@@ -19,19 +19,25 @@ final class FileBuffer: ObservableObject, Identifiable {
   nonisolated var id: String { filename }
 
   /// If true, this buffer contains changes that have not yet been saved.
-  @Published var isDirty = false
+  @Published private(set) var isDirty = false
 
   /// If true, the contents of the buffer have not yet been read from ``FakeFileSystem``
-  @Published var isLoading = true
+  @Published private(set) var isLoading = true
 
-  /// The actual file contents. This is private
+  /// The actual file contents. The stored property is private and is exposed through the computed property ``text``
   private var _text = ""
 
+  /// Gets/sets the in-memory copy of the file contents.
+  ///
+  /// Setting the in-memory copy of the file contents sets ``isDirty`` to `true` and makes sure that autosave will run some time in the future.
   var text: String {
     get {
-      _text
+      assert(!isLoading, "Shouldn't read the value of `text` until it is loaded.")
+      return _text
     }
     set {
+      assert(!isLoading, "Shouldn't write the value of `text` until it is loaded.")
+      objectWillChange.send()
       _text = newValue
       isDirty = true
       createAutosaveTaskIfNeeded()
@@ -53,7 +59,13 @@ final class FileBuffer: ObservableObject, Identifiable {
     // 4. The i/o from step 2 finishes, and you set isDirty = false. HOWEVER, the current contents of the buffer ("version 2")
     //    have not been saved. The buffer is dirty, and you won't save "version 2" unless you make more changes later.
     isDirty = false
-    try await FakeFileSystem.shared.saveFile(_text, filename: filename)
+    do {
+      try await FakeFileSystem.shared.saveFile(_text, filename: filename)
+    } catch {
+      // If there was an error, we need to reset `isDirty`
+      isDirty = true
+      throw error
+    }
   }
 
   private(set) var autosaveTask: Task<Void, Never>?

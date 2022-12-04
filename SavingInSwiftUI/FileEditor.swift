@@ -17,5 +17,11 @@ struct FileEditor: View {
       }
     }
     .navigationTitle((buffer.isDirty ? "• " : "") + buffer.filename)
+    .onDisappear {
+      Task {
+        try? await buffer.save()
+      }
+    }
+    .id(buffer.filename)
   }
 }
