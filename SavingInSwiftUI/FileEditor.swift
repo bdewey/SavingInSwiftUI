@@ -8,11 +8,14 @@ struct FileEditor: View {
   @ObservedObject var buffer: FileBuffer
 
   var body: some View {
-    if buffer.isLoading {
-      ProgressView()
-    } else {
-      TextEditor(text: $buffer.text)
-        .font(.body.leading(.loose))
+    Group {
+      if buffer.isLoading {
+        ProgressView()
+      } else {
+        TextEditor(text: $buffer.text)
+          .font(.body.leading(.loose))
+      }
     }
+    .navigationTitle((buffer.isDirty ? "• " : "") + buffer.filename)
   }
 }
